@@ -1,9 +1,9 @@
 from point import Point
 
 class Region(object):
-    def __init__(self, x_coordinate, y_coordinate, points_collection=None): # User passes in an array of points that they want
+    def __init__(self, x, y, points_collection=None): # User passes in an array of points that they want
         # Center point in which the sub quadrants are based off of
-        self.center = Point(x_coordinate, y_coordinate)
+        self.center = Point(x, y)
         
         self.capacity = 0 # Represents counter for when to subdivide
 
@@ -77,7 +77,7 @@ class Region(object):
         self.children[2] = Region((self.center.x + self.center.x // 2), self.center.y // 2)
 
         # Southwest region
-        self.children[3] = Region(self.center.x // 2)
+        self.children[3] = Region(self.center.x // 2, self.center.y // 2)
 
         # create 4 region quadrants and append to self.children
         
