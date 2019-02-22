@@ -63,15 +63,21 @@ class Region(object):
 
         # Check if this region node is over capacity, and if so call subdivide
 
-    def subdivide(self, region):
+    def subdivide(self):
         '''Splits the region into 4 separate quadrants based of center point of the region'''
         # Can do so by updating the center of the children region objects to be half the region's x and y coordinate
 
         # Northwest Region
-        region.children[0] = Region(region.x_coordinate // 2, region.y_coordinate // 2)
+        self.children[0] = Region(self.center.x // 2, self.center.y // 2)
 
         # Northeast Region
-        region.children[1] = Region((region.x_coordinate + region.x_coordinate // 2), (region.y_coordinate + region.y_coordinate // 2))
+        self.children[1] = Region((self.center.y + self.center.x // 2), (self.center.y + self.center.y // 2))
+
+        # Southeast region
+        self.children[2] = Region((self.center.x + self.center.x // 2), self.center.y // 2)
+
+        # Southwest region
+        self.children[3] = Region(self.center.x // 2)
 
         # create 4 region quadrants and append to self.children
-        pass
+        
