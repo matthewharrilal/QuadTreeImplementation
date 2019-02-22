@@ -1,12 +1,10 @@
 from point import Point
 
 class Region(object):
-    def __init__(self, x_coordinate, y_coordinate, width, height, points_collection=None): # User passes in an array of points that they want
+    def __init__(self, x_coordinate, y_coordinate, points_collection=None): # User passes in an array of points that they want
         # Center point in which the sub quadrants are based off of
         self.center = Point(x_coordinate, y_coordinate)
         
-        self.width = width
-        self.height = height
         self.capacity = 0 # Represents counter for when to subdivide
 
         self.children = []  # List of 0 or 4 Region objects that are children of this Region
@@ -21,7 +19,12 @@ class Region(object):
         '''Return an index in range [0...3] (0: NW, 1: NE, 2: SE, 3: SW) that specifies which
         subregion (child) the given point belongs to relative to this region's center.'''
 
-        if point.x_coordinate
+        # Not handling edge case where data lies directly on the axis
+
+        if point.x > self.center.x and point.y > self.center.y:
+            return 1 # Representing NE region
+
+        elif point.x > self.center.x and point.y < self.center.y
 
         pass
 
