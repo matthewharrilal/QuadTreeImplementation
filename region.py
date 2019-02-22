@@ -36,12 +36,27 @@ class Region(object):
         '''Returns true if point is contained inside given region'''
         pass
 
-    def insert(self, point):
+    def insert(self, point, region=None, quadrant=None):
+
         '''Inserts point inside region that contains that coordinate space'''
         # TODO: Find quadrant that the point lies in
         # TODO: Find insert then check if it is at capacity ... if so then subdivide which reogranizes those nodes into the correct regions
+        if quadrant is None and region is None:
+            region = self
 
-        pass
+            # You only have a quadrant when you subdivide though
+            quadrant = region.region_index(point) # Find the initial region
+            
+
+        if region.capacity > 0: # Meaning that we have to keep subdividing
+            # Do we insert that subdivide
+
+            region.subdivide() # Subdivide into four different quadrants and insert point into children 
+            # Update quadrant
+            quadrant = region.region_index(point)
+            self.insert(point, )
+        
+    
 
         # Check if this region node is over capacity, and if so call subdivide
 
