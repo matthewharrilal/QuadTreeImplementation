@@ -40,20 +40,19 @@ class Region(object):
 
         quadrant = region.region_index(point)
 
-        # print(region.children[quadrant].point)
+        print(region.children[quadrant])
         if point == region.point:
             return True
-        return False
 
-        # while region is not None: # Deep off in the maze
-        #     quadrant = self.region_index(point)
+        while region is not None: # Deep off in the maze
+            quadrant = self.region_index(point)
             
             
-        #     region = region.children[quadrant]
+            region = region.children[quadrant]
         
-        #     if point == region.point[0]:
-        #         return True
-        # return False
+            if point == region.point[0]:
+                return True
+        return False
     
     def insert(self, point, region=None):
 
@@ -67,7 +66,7 @@ class Region(object):
             # Meaning we found a valid subqaudrant
             
             region.point.append(point)
-            # print(region.point[0].x, region.point[0].y)
+            print(region.point)
             region.capacity += 1
             return region # Once you've inserted operation is done so filter back up the recursive call and pathway of quadrants it took to get to that subquadrant
 
@@ -89,22 +88,18 @@ class Region(object):
         # Northwest Region
         self.children[0] = Region(self.center.x // 2, (self.center.y + self.center.y // 2))
         point1 = Point(self.center.x // 2, (self.center.y + self.center.y // 2))
-        print(self.region_index((point1)))
 
         # Northeast Region
         self.children[1] = Region((self.center.x + self.center.x // 2), (self.center.y + self.center.y // 2))
         point2 = Point((self.center.x + self.center.x // 2), (self.center.y + self.center.y // 2))
-        print(self.region_index(point2))
 
         # Southeast region
         self.children[2] = Region((self.center.x + self.center.x // 2), self.center.y // 2)
         point3 = Point((self.center.x + self.center.x // 2), self.center.y // 2)
-        print(self.region_index(point3))
 
         # Southwest region
         self.children[3] = Region(self.center.x // 2, self.center.y // 2)
         point4 = Point(self.center.x // 2, self.center.y // 2)
-        print(self.region_index(point4))
 
 
 
