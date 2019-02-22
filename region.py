@@ -5,15 +5,15 @@ class Region(object):
         # Center point in which the sub quadrants are based off of
         self.center = Point(x, y)
 
-        self.point = []
+        self.point = [] # Made array because didn't have position of an initializer point
         
         self.capacity = 0 # Represents counter for when to subdivide
 
-        self.children = []  # List of 0 or 4 Region objects that are children of this Region
+        self.children = [None] * 4 # List of 0 or 4 Region objects that are children of this Region
 
 
         # What does this mean? For each point in the point collection we insert, recursively finding the region that we can contain the point to 
-        if len(points_collection) > 0:
+        if points_collection is not None:
             for point in points_collection:
                 self.insert(point)
 
@@ -35,33 +35,50 @@ class Region(object):
             return 3 # Representing the southwest region 
 
     def contains(self, point):
-        '''Returns true if point is contained inside given region'''
-        pass
+        '''Returns true if point is contained inside the quad tree'''
+        region = self
 
-    def insert(self, point, region=None, pathway=None):
+        quadrant = region.region_index(point)
+
+        print(region.children[quadrant])
+        if point == region.point:
+            return True
+        return False
+
+        # while region is not None: # Deep off in the maze
+        #     quadrant = self.region_index(point)
+            
+            
+        #     region = region.children[quadrant]
+        
+        #     if point == region.point[0]:
+        #         return True
+        # return False
+    
+    def insert(self, point, region=None):
 
         '''Inserts point inside region that contains that coordinate space'''
         # TODO: Find quadrant that the point lies in
         # TODO: Find insert then check if it is at capacity ... if so then subdivide which reogranizes those nodes into the correct regions
-        if region is None and pathway is None:
+        if region is None:
             region = self
-            pathway = ""
-        
+
         if region.capacity == 0:
             # Meaning we found a valid subqaudrant
+            
             region.point.append(point)
-            return region # Once you've inserted operation is done so filter back up the recursive call 
+            # print(region.point[0].x, region.point[0].y)
+            region.capacity += 1
+            return region # Once you've inserted operation is done so filter back up the recursive call and pathway of quadrants it took to get to that subquadrant
 
         if region.capacity > 0: # Meaning that we have to keep subdividing
             # Do we insert that subdivide
-            
             # Mutating the instance that calls the method
             region.subdivide() # Subdivide into four different quadrants 
 
             quadrant = region.region_index(point) # Find the quadrant in which the point lies in after you mutate the region
-            pathway += str(quadrant) # Concatenate quadrant path as we progress
-            self.insert(point, region.children[quadrant], pathway) # Find valid subquadrant and insert point
-        
+            self.insert(point, region.children[quadrant]) # Find valid subquadrant and insert point
+            
        
 
 
@@ -81,5 +98,12 @@ class Region(object):
         # Southwest region
         self.children[3] = Region(self.center.x // 2, self.center.y // 2)
 
-        # create 4 region quadrants and append to self.children
-        
+
+
+
+region = Region(100, 100, [Point(50, 50), Point(150, 50), Point(150, 150), Point(50, 150)])
+
+print(region.contains(Point(50, 50)))
+print(region.contains(Point(150, 50)))
+print(region.contains(Point(150, 150)))
+print(region.contains(Point(50, 150))) 
