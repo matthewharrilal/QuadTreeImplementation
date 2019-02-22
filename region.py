@@ -28,20 +28,16 @@ class Region(object):
 
     def insert(self, point):
         '''Inserts point inside region that contains that coordinate space'''
+        # TODO: Find quadrant that the point lies in
+        # TODO: Find insert then check if it is at capacity ... if so then subdivide which reogranizes those nodes into the correct regions
 
-        # recursive has to find region it can populate
-
-        # check if the given point relative to this region's center is northwest
-        # region_index = self.region_index(point)  # 0: NW, 1: NE, 2: SE, 3: SW
-
-        # Check if region contains point if true then you can insert
         pass
 
         # Check if this region node is over capacity, and if so call subdivide
 
     def subdivide(self, region):
         '''Splits the region into 4 separate quadrants based of center point of the region'''
-        
+        # has to rebalance points
 
         # create 4 region quadrants and append to self.children
         pass
