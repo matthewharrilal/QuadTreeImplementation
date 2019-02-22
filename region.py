@@ -3,15 +3,16 @@ from point import Point
 class Region(object):
     def __init__(self, x_coordinate, y_coordinate, width, height, points_collection=None): # User passes in an array of points that they want
         # Center point in which the sub quadrants are based off of
-        self.x_coordinate = x_coordinate # Point object that represents the center
-        self.y_coordinate = y_coordinate
-
+        self.center = Point(x_coordinate, y_coordinate)
+        
         self.width = width
         self.height = height
         self.capacity = 0 # Represents counter for when to subdivide
 
         self.children = []  # List of 0 or 4 Region objects that are children of this Region
 
+
+        # What does this mean? For each point in the point collection we insert, recursively finding the region that we can contain the point to 
         if len(points_collection) > 0:
             for point in points_collection:
                 self.insert(point)
