@@ -1,7 +1,7 @@
 from point import Point
 
-class Region(object):
-    def __init__(self, x, y, points_collection=None): # User passes in an array of points that they want
+class RegionNode(object):
+    def __init__(self, x, y): # User passes in an array of points that they want
         # Center point in which the sub quadrants are based off of
         self.center = Point(x, y)
 
@@ -12,9 +12,17 @@ class Region(object):
         self.children = [None] * 4 # List of 0 or 4 Region objects that are children of this Region
 
 
-        # What does this mean? For each point in the point collection we insert, recursively finding the region that we can contain the point to 
-        if points_collection is not None:
-            for point in points_collection:
+        # # What does this mean? For each point in the point collection we insert, recursively finding the region that we can contain the point to 
+        # if points_collection is not None:
+        #     for point in points_collection:
+        #         self.insert(point)
+
+class QuadTree(object):
+    def __init__(self, x, y, point_collection=None):
+        self.center = Point(x, y)
+        
+        if point_collection is not None:
+            for point in point_collection:
                 self.insert(point)
 
     def region_index(self, point):
@@ -47,7 +55,8 @@ class Region(object):
         while region is not None: # Deep off in the maze
             quadrant = self.region_index(point)
             
-            
+            for key, value in enumerate(region):
+                print("hey %s %s", key, value)
             region = region.children[quadrant]
         
             if point == region.point[0]:
@@ -74,7 +83,7 @@ class Region(object):
             # Do we insert that subdivide
             # Mutating the instance that calls the method
             region.subdivide() # Subdivide into four different quadrants 
-
+ 
             quadrant = region.region_index(point) # Find the quadrant in which the point lies in after you mutate the region
             self.insert(point, region.children[quadrant]) # Find valid subquadrant and insert point
             
