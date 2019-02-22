@@ -20,13 +20,17 @@ class Region(object):
         subregion (child) the given point belongs to relative to this region's center.'''
 
         # Not handling edge case where data lies directly on the axis
+        if point.x < self.center.x and point.y > self.center.y:
+            return 0 # Representing the Northwest region
 
-        if point.x > self.center.x and point.y > self.center.y:
+        elif point.x > self.center.x and point.y > self.center.y:
             return 1 # Representing NE region
 
-        elif point.x > self.center.x and point.y < self.center.y
+        elif point.x > self.center.x and point.y < self.center.y:
+            return 2 # Representing the SE region
 
-        pass
+        elif point.x < self.center.x and point.y < self.center.y:
+            return 3 # Representing the southwest region 
 
     def contains(self, point):
         '''Returns true if point is contained inside given region'''
