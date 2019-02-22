@@ -20,6 +20,9 @@ class Region(object):
     def region_index(self, point):
         '''Return an index in range [0...3] (0: NW, 1: NE, 2: SE, 3: SW) that specifies which
         subregion (child) the given point belongs to relative to this region's center.'''
+
+        if point.x_coordinate
+
         pass
 
     def contains(self, point):
