@@ -4,6 +4,8 @@ class Region(object):
     def __init__(self, x, y, points_collection=None): # User passes in an array of points that they want
         # Center point in which the sub quadrants are based off of
         self.center = Point(x, y)
+
+        self.point = []
         
         self.capacity = 0 # Represents counter for when to subdivide
 
@@ -36,32 +38,32 @@ class Region(object):
         '''Returns true if point is contained inside given region'''
         pass
 
-    def insert(self, point, region=None, quadrant=None):
+    def insert(self, point, region=None, pathway=None):
 
         '''Inserts point inside region that contains that coordinate space'''
         # TODO: Find quadrant that the point lies in
         # TODO: Find insert then check if it is at capacity ... if so then subdivide which reogranizes those nodes into the correct regions
-        if quadrant is None and region is None:
+        if region is None and pathway is None:
             region = self
-
-            # You only have a quadrant when you subdivide though
-            quadrant = region.region_index(point) # Find the initial region
-            
+            pathway = ""
+        
+        if region.capacity == 0:
+            # Meaning we found a valid subqaudrant
+            region.point.append(point)
+            return region # Once you've inserted operation is done so filter back up the recursive call 
 
         if region.capacity > 0: # Meaning that we have to keep subdividing
             # Do we insert that subdivide
-
+            
+            # Mutating the instance that calls the method
             region.subdivide() # Subdivide into four different quadrants 
 
-            # Already have region subchildren at this time ... then find position of quadrant to be able to subscript
-            quadrant = region.region_index(point)
-            self.insert(point, region.children[quadrant])
-
-        return region # Return region that the point is finally inserted to ... proper return statement
+            quadrant = region.region_index(point) # Find the quadrant in which the point lies in after you mutate the region
+            pathway += str(quadrant) # Concatenate quadrant path as we progress
+            self.insert(point, region.children[quadrant], pathway) # Find valid subquadrant and insert point
         
-    
+       
 
-        # Check if this region node is over capacity, and if so call subdivide
 
     def subdivide(self):
         '''Splits the region into 4 separate quadrants based of center point of the region'''
