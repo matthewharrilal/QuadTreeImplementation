@@ -40,7 +40,7 @@ class Region(object):
 
         quadrant = region.region_index(point)
 
-        print(region.children[quadrant])
+        # print(region.children[quadrant].point)
         if point == region.point:
             return True
         return False
@@ -87,23 +87,31 @@ class Region(object):
         # Can do so by updating the center of the children region objects to be half the region's x and y coordinate
 
         # Northwest Region
-        self.children[0] = Region(self.center.x // 2, self.center.y // 2)
+        self.children[0] = Region(self.center.x // 2, (self.center.y + self.center.y // 2))
+        point1 = Point(self.center.x // 2, (self.center.y + self.center.y // 2))
+        print(self.region_index((point1)))
 
         # Northeast Region
-        self.children[1] = Region((self.center.y + self.center.x // 2), (self.center.y + self.center.y // 2))
+        self.children[1] = Region((self.center.x + self.center.x // 2), (self.center.y + self.center.y // 2))
+        point2 = Point((self.center.x + self.center.x // 2), (self.center.y + self.center.y // 2))
+        print(self.region_index(point2))
 
         # Southeast region
         self.children[2] = Region((self.center.x + self.center.x // 2), self.center.y // 2)
+        point3 = Point((self.center.x + self.center.x // 2), self.center.y // 2)
+        print(self.region_index(point3))
 
         # Southwest region
         self.children[3] = Region(self.center.x // 2, self.center.y // 2)
+        point4 = Point(self.center.x // 2, self.center.y // 2)
+        print(self.region_index(point4))
 
 
 
 
-region = Region(100, 100, [Point(50, 50), Point(150, 50), Point(150, 150), Point(50, 150)])
+region = Region(100, 100, [Point(50, 50), Point(150, 50)])
 
 print(region.contains(Point(50, 50)))
 print(region.contains(Point(150, 50)))
-print(region.contains(Point(150, 150)))
-print(region.contains(Point(50, 150))) 
+# print(region.contains(Point(150, 150)))
+# print(region.contains(Point(50, 150))) 
