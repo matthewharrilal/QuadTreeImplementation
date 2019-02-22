@@ -10,7 +10,14 @@ class Region(object):
             for point in points_collection:
                 self.insert(point)
 
-    # def contains(self, point):
-    #     '''Returns true if point is contained inside given region'''
-    #     p
+    def contains(self, point):
+        '''Returns true if point is contained inside given region'''
+        pass
 
+    def insert(self, point):
+        '''Inserts point inside region that contains that coordinate space'''
+        pass
+
+    def subdivide(self):
+        '''Splits the region into 4 separate quadrants'''
+        pass
