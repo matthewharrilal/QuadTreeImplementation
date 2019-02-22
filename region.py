@@ -51,10 +51,13 @@ class Region(object):
         if region.capacity > 0: # Meaning that we have to keep subdividing
             # Do we insert that subdivide
 
-            region.subdivide() # Subdivide into four different quadrants and insert point into children 
-            # Update quadrant
+            region.subdivide() # Subdivide into four different quadrants 
+
+            # Already have region subchildren at this time ... then find position of quadrant to be able to subscript
             quadrant = region.region_index(point)
-            self.insert(point, )
+            self.insert(point, region.children[quadrant])
+
+        return region # Return region that the point is finally inserted to ... proper return statement
         
     
 
