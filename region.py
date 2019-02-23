@@ -13,6 +13,8 @@ class RegionNode(object):
         # List of 0 or 4 Region objects that are children of this Region
         self.children = [None] * 4
 
+        self.isDivided = False
+
         # POINTS ARE CONTAINED BY THE REGION NODE
 
         # SUBDIVISION CHILDREN ARE CONTAINED BY NODES
@@ -44,15 +46,14 @@ class RegionNode(object):
         if point.x < self.center.x and point.y > self.center.y:
             return 0  # Representing the Northwest region
 
-        elif point.x > self.center.x and point.y > self.center.y:
+        elif point.x >= self.center.x and point.y >= self.center.y:
+
             return 1  # Representing NE region
 
         elif point.x > self.center.x and point.y < self.center.y:
-            # print(point.x, self.center.x, point.y, self.center.y)
-
             return 2  # Representing the SE region
 
-        elif point.x < self.center.x and point.y < self.center.y:
+        else:
             return 3  # Representing the southwest region
 
 
@@ -66,6 +67,8 @@ class QuadTree(object):
 
     # Insert because it is across multiple nodes
 
+
+    # SOMETHING WRONG WITH THE ACT OF REASSIGNING POINTS
     def insert(self, point, region=None):
         '''Inserts point inside region that contains that coordinate space'''
         # TODO: Find quadrant that the point lies in
@@ -75,32 +78,28 @@ class QuadTree(object):
         
         if region.capacity == 0:
             # Meaning we found a valid subqaudrant
-
-
             region.point.append(point)
             region.capacity += 1
             return region  # Once you've inserted operation is done so filter back up the recursive call and pathway of quadrants it took to get to that subquadrant
 
         if region.capacity > 0:  # Meaning that we have to keep subdividing
-            print("INFINITE")
-            # Since capacity has to be over 1 we have to rebalance
-            # Do we insert that subdivide
-            # Mutating the instance that calls the method
-            
-            region.subdivide()  # Subdivide into four different quadrants
-           
+         
+            if region.isDivided == False:
 
-            # Find the quadrant in which the point lies in after you mutate the region
-            print(region.center.x)
-            # region.capacity = 0
-            quadrant = region.region_index(point) # Also have to rebalance existing points
-            # Find valid subquadrant and insert point
+                region.subdivide()  # Subdivide into four different quadrants
+                region.isDivided = True
+         
 
-            for existing_point in region.point:
-                replacement_quadrant = region.region_index(existing_point) # Find new location
-                region.children[replacement_quadrant].point.append(existing_point) # Append that point as well to the proper quadrant
+            quadrant = region.region_index(point)
 
-                region.point = [] # Reset regions points before subdivision to be clear
+            # for existing_point in region.point:
+
+            #     replacement_quadrant = region.region_index(existing_point) # Find new location
+                
+
+            #     region.children[replacement_quadrant].point.append(existing_point) # Append that point as well to the proper quadrant
+
+            #     region.point = [] # Reset regions points before subdivision to be clear
                 
             
             self.insert(point, region.children[quadrant])
@@ -109,28 +108,31 @@ class QuadTree(object):
     def contains(self, point):
         '''Returns true if point is contained inside the quad tree'''
         region = self.root_region # Representing the starting region
+        # Already been subdivided
+        
 
         # Iterate through the regions until we find the point
 
         while region is not None: # While there are caculated regions to traverse through
             quadrant = region.region_index(point)
-
+            
             # When are you traversing you want to check which region contains the point when subdividing do you
             # First check if that regions point exists
+
             if len(region.point) > 0 and region is not None: # Meaning that a point exists
                 if region.point[0].x == point.x and region.point[0].y == point.y: # If the coordinates match
                     return True     
                 
                 # Else keep traversing buddy
-                region = region.children[quadrant]
+            region = region.children[quadrant]
         return False
 
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(150, 50), Point(50, 50)])
+quad_tree = QuadTree(100, 100, [Point(50, 50), Point(150, 50), Point(150, 150)])
 
-print(quad_tree.contains(Point(150, 50)))
 print(quad_tree.contains(Point(50, 50)))
+print(quad_tree.contains(Point(150, 50)))
+print(quad_tree.contains(Point(150, 150)))
+print(quad_tree.contains(Point(60, 50)))
 
-# print(quad_tree.contains(Point(150, 150)))
-# print(region.contains(Point(50, 150)))
