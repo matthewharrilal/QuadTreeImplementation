@@ -13,7 +13,7 @@ class RegionNode(object):
         # List of 0 or 4 Region objects that are children of this Region
         self.children = [None] * 4
 
-        self.isDivided = False
+        self.isDivided = False # So depending if capacity is full check for available spots without subdividing first
 
         # POINTS ARE CONTAINED BY THE REGION NODE
 
@@ -78,6 +78,7 @@ class QuadTree(object):
         
         if region.capacity == 0:
             # Meaning we found a valid subqaudrant
+            print("Only point ", region.children)
             region.point.append(point)
             region.capacity += 1
             return region  # Once you've inserted operation is done so filter back up the recursive call and pathway of quadrants it took to get to that subquadrant
@@ -109,30 +110,34 @@ class QuadTree(object):
         '''Returns true if point is contained inside the quad tree'''
         region = self.root_region # Representing the starting region
         # Already been subdivided
-        
+        pathway = ""
 
         # Iterate through the regions until we find the point
 
         while region is not None: # While there are caculated regions to traverse through
             quadrant = region.region_index(point)
+            pathway += str(quadrant)
             
             # When are you traversing you want to check which region contains the point when subdividing do you
             # First check if that regions point exists
 
             if len(region.point) > 0 and region is not None: # Meaning that a point exists
+                # Have to compare attributes as opposed to point objects?? Better way to do this?
                 if region.point[0].x == point.x and region.point[0].y == point.y: # If the coordinates match
+                    print(pathway)
                     return True     
                 
                 # Else keep traversing buddy
+        
             region = region.children[quadrant]
         return False
 
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(50, 50), Point(150, 50), Point(150, 150)])
+quad_tree = QuadTree(100, 100, [Point(150, 150), Point(50, 50)])
 
 print(quad_tree.contains(Point(50, 50)))
 print(quad_tree.contains(Point(150, 50)))
 print(quad_tree.contains(Point(150, 150)))
-print(quad_tree.contains(Point(60, 50)))
+print(quad_tree.contains(Point(150, 60)))
 
