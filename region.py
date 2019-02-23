@@ -23,7 +23,7 @@ class RegionNode(object):
 
         # Northwest Region
         self.children[0] = RegionNode(self.center.x // 2, (self.center.y + self.center.y // 2))
-     
+
         # Northeast Region
         self.children[1] = RegionNode((self.center.x + self.center.x // 2), (self.center.y + self.center.y // 2))
         
@@ -39,6 +39,8 @@ class RegionNode(object):
         '''Return an index in range [0...3] (0: NW, 1: NE, 2: SE, 3: SW) that specifies which
         subregion (child) the given point belongs to relative to this region's center.'''
         # Not handling edge case where data lies directly on the axis
+
+        # SELF NOT REFERRING TO THE NEW REGION
         if point.x < self.center.x and point.y > self.center.y:
             return 0  # Representing the Northwest region
 
@@ -46,6 +48,8 @@ class RegionNode(object):
             return 1  # Representing NE region
 
         elif point.x > self.center.x and point.y < self.center.y:
+            # print(point.x, self.center.x, point.y, self.center.y)
+
             return 2  # Representing the SE region
 
         elif point.x < self.center.x and point.y < self.center.y:
@@ -68,17 +72,18 @@ class QuadTree(object):
         # TODO: Find insert then check if it is at capacity ... if so then subdivide which reogranizes those nodes into the correct regions
         if region is None:
             region = self.root_region
-
+        
         if region.capacity == 0:
             # Meaning we found a valid subqaudrant
+
 
             region.point.append(point)
             region.capacity += 1
             return region  # Once you've inserted operation is done so filter back up the recursive call and pathway of quadrants it took to get to that subquadrant
 
-        if region.capacity > 1:  # Meaning that we have to keep subdividing
+        if region.capacity > 0:  # Meaning that we have to keep subdividing
+            print("INFINITE")
             # Since capacity has to be over 1 we have to rebalance
-
             # Do we insert that subdivide
             # Mutating the instance that calls the method
             
@@ -86,14 +91,17 @@ class QuadTree(object):
            
 
             # Find the quadrant in which the point lies in after you mutate the region
-
+            print(region.center.x)
+            # region.capacity = 0
             quadrant = region.region_index(point) # Also have to rebalance existing points
             # Find valid subquadrant and insert point
 
             for existing_point in region.point:
                 replacement_quadrant = region.region_index(existing_point) # Find new location
-                region.point = []
-                region.children[replacement_quadrant].point.append(existing_point)
+                region.children[replacement_quadrant].point.append(existing_point) # Append that point as well to the proper quadrant
+
+                region.point = [] # Reset regions points before subdivision to be clear
+                
             
             self.insert(point, region.children[quadrant])
             
@@ -121,7 +129,8 @@ class QuadTree(object):
 # Second element not working as a result of the subdivide
 quad_tree = QuadTree(100, 100, [Point(150, 50), Point(50, 50)])
 
-print(quad_tree.contains(Point(50, 50)))
 print(quad_tree.contains(Point(150, 50)))
+print(quad_tree.contains(Point(50, 50)))
+
 # print(quad_tree.contains(Point(150, 150)))
 # print(region.contains(Point(50, 150)))
