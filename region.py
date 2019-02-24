@@ -1,5 +1,5 @@
 from point import Point
-
+import random
 
 class RegionNode(object):
     def __init__(self, x, y):  # User passes in an array of points that they want
@@ -69,6 +69,7 @@ class QuadTree(object):
     # Insert because it is across multiple nodes
 
 
+
     # SOMETHING WRONG WITH THE ACT OF REASSIGNING POINTS
     def insert(self, point, region=None):
         '''Inserts point inside region that contains that coordinate space'''
@@ -85,12 +86,19 @@ class QuadTree(object):
         if region.capacity > 0 :  # Meaning that there is already a point in there
          
             if region.isDivided == False:
-                region.subdivide()  # Subdivide into four different quadrants
 
+                # Before we subdivide we have to rebalance the existing point
+
+                region.subdivide()  # Subdivide into four different quadrants
                 region.isDivided = True
+                # replacement_quadrant = region.region_index(region.point[0])
+                # region.children[replacement_quadrant].point.append(region.point[0])
                 
 
             quadrant = region.region_index(point)
+            
+
+
 
             # for existing_point in region.point:
 
@@ -137,7 +145,9 @@ class QuadTree(object):
         while region is not None: # If the region exists
 
             if point.x == region.point[0].x and point.y == region.point[0].y:
-                return "ROOT REGION" if pathway == "" else pathway
+                # If we found the pathway but remains in the root region ... no concatenation to pathway
+                quad = region.region_index(point)
+                return quad if pathway == "" else pathway
 
             quadrant = region.region_index(point)
             pathway += str("Quadrant -> {} ".format(quadrant)) # Only add pathway if index of quadrant exists
@@ -147,18 +157,17 @@ class QuadTree(object):
         return pathway
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(150, 150),Point(50, 50), Point(60, 60), Point(89, 45)])
+quad_tree = QuadTree(100, 100, [Point(150, 150),Point(150, 140), Point(50, 50), Point(40, 40), Point(60, 60)])
+points_array = []
 
-print(quad_tree.pathway(Point(150, 150)))
-print("")
-print("")
-print(quad_tree.pathway(Point(150, 140)))
-print("")
-print("")
-print(quad_tree.pathway(Point(50, 50)))
-print("")
-print("")
-print(quad_tree.pathway(Point(60, 60)))
-print("")
-print("")
-print(quad_tree.pathway(Point(89, 45)))
+for i in range(20):
+    random_x = random.randint(0,1000)
+    random_y = random.randint(0,1000)
+    points_array.append(Point(random_x, random_y))
+    quad_tree.insert(Point(random_x, random_y))
+
+
+for point in points_array:
+    print(quad_tree.pathway(point))
+    print("")
+    print("")
