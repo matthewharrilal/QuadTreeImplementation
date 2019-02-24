@@ -140,14 +140,14 @@ class QuadTree(object):
                 return "ROOT REGION" if pathway == "" else pathway
 
             quadrant = region.region_index(point)
-            pathway += str(quadrant) # Only add pathway if index of quadrant exists
+            pathway += str("Quadrant -> {} ".format(quadrant)) # Only add pathway if index of quadrant exists
 
             region = region.children[quadrant] # Keep going until you find specific quadrant that contains point
             
         return pathway
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(150, 150),Point(50, 50), Point(60, 60), Point(89, 45), Point(150, 140)])
+quad_tree = QuadTree(100, 100, [Point(150, 150),Point(50, 50), Point(60, 60), Point(89, 45)])
 
 print(quad_tree.pathway(Point(150, 150)))
 print("")
