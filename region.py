@@ -80,7 +80,7 @@ class QuadTree(object):
             # Meaning we found a valid subqaudrant
             region.point.append(point)
             region.capacity += 1
-            return   # Once you've inserted operation is done
+            return region  # Once you've inserted operation is done
 
         if region.capacity > 0 :  # Meaning that there is already a point in there
          
@@ -88,7 +88,7 @@ class QuadTree(object):
                 region.subdivide()  # Subdivide into four different quadrants
 
                 region.isDivided = True
-         
+                
 
             quadrant = region.region_index(point)
 
@@ -108,34 +108,57 @@ class QuadTree(object):
         '''Returns true if point is contained inside the quad tree'''
         region = self.root_region # Representing the starting region
         # Already been subdivided
-        pathway = ""
 
         # Iterate through the regions until we find the point
 
-        while region: # If the region exists
+        while region is not None: # If the region exists
             
             quadrant = region.region_index(point) # Find the corresponding quadrant
 
-       
-            pathway += str(quadrant)
 
             if len(region.point) > 0: # If the region contains a point
                 
 
                 if region.point[0].x == point.x and region.point[0].y == point.y: # If the coordinates match
-                    return True , pathway   
+                    return True   
             
             region = region.children[quadrant]
         return False
 
+    def pathway(self, point):
+        '''Finds pathway through quadrants'''
+        region = self.root_region
+        pathway = ""
+
+        # First lets check if point exists before we find the pathway
+        if self.contains(point) is False:
+            return "No pathway available"
+
+        while region is not None: # If the region exists
+
+            if point.x == region.point[0].x and point.y == region.point[0].y:
+                return "ROOT REGION" if pathway == "" else pathway
+
+            quadrant = region.region_index(point)
+            pathway += str(quadrant) # Only add pathway if index of quadrant exists
+
+            region = region.children[quadrant] # Keep going until you find specific quadrant that contains point
+            
+        return pathway
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(150, 150), Point(50, 50), Point(50,60)])
+quad_tree = QuadTree(100, 100, [Point(150, 150),Point(50, 50), Point(60, 60), Point(89, 45), Point(150, 140)])
 
-print(quad_tree.contains(Point(150, 150)))
+print(quad_tree.pathway(Point(150, 150)))
 print("")
 print("")
-print(quad_tree.contains(Point(50, 50)))
+print(quad_tree.pathway(Point(150, 140)))
 print("")
 print("")
-print(quad_tree.contains(Point(60, 60)))
+print(quad_tree.pathway(Point(50, 50)))
+print("")
+print("")
+print(quad_tree.pathway(Point(60, 60)))
+print("")
+print("")
+print(quad_tree.pathway(Point(89, 45)))
