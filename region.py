@@ -15,10 +15,9 @@ class RegionNode(object):
 
         self.isDivided = False # So depending if capacity is full check for available spots without subdividing first
 
-
-        # POINTS ARE CONTAINED BY THE REGION NODE
-
-        # SUBDIVISION CHILDREN ARE CONTAINED BY NODES
+    def insert(self, point):
+        '''Inserts point inside region that contains that coordinate space'''
+        # TODO: move code from QuadTree.insert() - replace region with self
 
     def subdivide(self):
         '''Splits the region into 4 separate quadrants based of center point of the region'''
@@ -66,50 +65,48 @@ class QuadTree(object):
             for point in point_collection:
                 self.insert(point)
 
-    # Insert because it is across multiple nodes
-
-
 
     # SOMETHING WRONG WITH THE ACT OF REASSIGNING POINTS
     def insert(self, point, region=None):
         '''Inserts point inside region that contains that coordinate space'''
        
-        if region is None:
-            region = self.root_region
+        # if region is None:
+        #     region = self.root_region
+        self.root_region.insert(point)
         
+
+        # ALL CODE BELOW should be moved to RegionNode.insert
+
+        # if len(region.points) < region.capacity 
         if region.capacity == 0:
+
             # Meaning we found a valid subqaudrant
             region.point.append(point)
             region.capacity += 1
             return region  # Once you've inserted operation is done
 
+
+        # else:  # len(region.point) >= region.capacity
         if region.capacity > 0 :  # Meaning that there is already a point in there
          
             if region.isDivided == False:
 
-                # Before we subdivide we have to rebalance the existing point
-
                 region.subdivide()  # Subdivide into four different quadrants
                 region.isDivided = True
-                # replacement_quadrant = region.region_index(region.point[0])
-                # region.children[replacement_quadrant].point.append(region.point[0])
-                
+                # Add the point to this region's points before moving them
+                # region.points.append(point)
+                # TODO: move all points in region.points into 4 subregions you just made
+                # for point in region.points:
+                #     # move point into the correct subregion
+                #     quadrant = region.region_index(point)
+                #     subregion = region.children[quadrant]
+                #     self.insert(point, subregion)
+                #     NEW CODE: subregion.insert(point)
+
 
             quadrant = region.region_index(point)
-            
-
-
-
-            # for existing_point in region.point:
-
-            #     replacement_quadrant = region.region_index(existing_point) # Find new location
-                
-
-            #     # region.children[replacement_quadrant].point.append(existing_point)
-               
-                
-            # region.point = [] # Reset regions points before subdivision to be clear
-            self.insert(point, region.children[quadrant])
+            subregion = region.children[quadrant]
+            self.insert(point, subregion)
             
 
     def contains(self, point):
@@ -146,8 +143,8 @@ class QuadTree(object):
 
             if point.x == region.point[0].x and point.y == region.point[0].y:
                 # If we found the pathway but remains in the root region ... no concatenation to pathway
-                quad = region.region_index(point)
-                return quad if pathway == "" else pathway
+                
+                return "Point lies in root region" if pathway == "" else pathway
 
             quadrant = region.region_index(point)
             pathway += str("Quadrant -> {} ".format(quadrant)) # Only add pathway if index of quadrant exists
@@ -157,7 +154,7 @@ class QuadTree(object):
         return pathway
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(150, 150),Point(150, 140), Point(50, 50), Point(40, 40), Point(60, 60)])
+quad_tree = QuadTree(100, 100, [Point(150, 150),Point(60, 120), Point(120, 140), Point(40, 40), Point(95, 120)])
 points_array = []
 
 for i in range(20):
@@ -170,4 +167,18 @@ for i in range(20):
 for point in points_array:
     print(quad_tree.pathway(point))
     print("")
-    print("")
+
+# print(quad_tree.pathway(Point(150, 150)))
+# print("")
+
+# print(quad_tree.pathway(Point(60, 120)))
+# print("")
+
+# print(quad_tree.pathway(Point(120, 140)))
+# print("")
+
+# print(quad_tree.pathway(Point(40, 40)))
+# print("")
+
+# print(quad_tree.pathway(Point(95, 120)))
+# print("")
