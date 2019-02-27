@@ -15,26 +15,41 @@ class RegionNode(object):
 
         self.isDivided = False # So depending if capacity is full check for available spots without subdividing first
 
-    def insert(self, point):
+        self.depth = 0
+
+    def insert(self, point, existing_point=None,super_region=None):
         '''Inserts point inside region that contains that coordinate space'''
-        # TODO: move code from QuadTree.insert() - replace region with self
-        # occuring at a point in time where we know the regions capacity is over 0 because we are being handed off here
- 
-        if self.capacity == 0:  # Meaning that we found a valid region
-            self.points.append(point)
+       
+        if existing_point is None and super_region is None:
+            existing_point = self.points[0]
+            super_region = self
+      
+        if self.capacity == 0:  
+            self.points.append(point) 
             self.capacity += 1
+
+            existing_quadrant = self.region_index(existing_point)
+            super_region.children[existing_quadrant].points.append(existing_point)
+
             return 
 
 
-        if self.capacity > 0: # Meaning that there is already a point in the region
+        if self.capacity > 0 : # Meaning that there is already a point in the region
             if self.isDivided == False:  # Meaning that we haven't subdivided the region
+                
+                # You know when you subdivide there is an existing point becuase the capacity is 1 and it hasnt been divided yet therefore 
                 self.subdivide()
-                self.isDivided = True   # Mark that this region has been divided
+                self.isDivided = True   
 
+                # We can take that existing point
+
+            # Find where new point should be inserted
             quadrant = self.region_index(point)
-            subregion = self.children[quadrant]  # Find the subregion that corresponds to the quadrant and use that as self
 
-            subregion.insert(point)
+            subregion = self.children[quadrant]  
+            subregion.depth = self.depth + 1
+
+            subregion.insert(point, self.points[0], self)  # Insert the point into the proper subregion
             
             
 
@@ -88,43 +103,30 @@ class QuadTree(object):
     # SOMETHING WRONG WITH THE ACT OF REASSIGNING POINTS
     def insert(self, point, region=None):
         '''Inserts point inside region that contains that coordinate space'''
+        exists = []
 
         # Meaning that the point can lie in the root region
         if self.root_region.capacity == 0: 
             self.root_region.points.append(point)
             self.root_region.capacity += 1
-            return self.root_region
+            return 
 
-        else:  # Meaning that there is no room and pass of the insertion to the region class
-            self.root_region.points.append(point) # Append point and then leave the insertion function of the point to rebalance and place in correct region
-
-            for existing_point in self.root_region.points:
-                # print("Existing point ", existing_point.x, existing_point.y)
-                self.root_region.insert(existing_point)
-
-
-        # # else:  # len(region.point) >= region.capacity
-        # if region.capacity > 0 :  # Meaning that there is already a point in there
-         
-        #     if region.isDivided == False:
-
-        #         region.subdivide()  # Subdivide into four different quadrants
-        #         region.isDivided = True
-        #         # Add the point to this region's points before moving them
-        #         # region.points.append(point)
-        #         # TODO: move all points in region.points into 4 subregions you just made
-        #         # for point in region.points:
-        #         #     # move point into the correct subregion
-        #         #     quadrant = region.region_index(point)
-        #         #     subregion = region.children[quadrant]
-        #         #     self.insert(point, subregion)
-        #         #     NEW CODE: subregion.insert(point)
-
-
-        #     quadrant = region.region_index(point)
-        #     subregion = region.children[quadrant]
-        #     self.insert(point, subregion)
+        else:  # Meaning that there is a point that already exists within the region
             
+            if len(self.root_region.points) > 0:  # Meaning we know the capacity is 1 and there is an existing point inside the region
+                existing_point = self.root_region.points[0]
+                self.root_region.insert(existing_point)  # Rebalance existing point then clear the regions existing point
+                self.root_region.insert(point)
+                self.root_region.points = []
+                return
+
+            else:  # Meaning that the region had a capacity of 1 but there was no existing point then lets just find a region for the new point
+                self.root_region.insert(point)
+                return
+
+            
+                
+
 
     def contains(self, point):
         '''Returns true if point is contained inside the quad tree'''
@@ -140,7 +142,6 @@ class QuadTree(object):
 
             if len(region.points) > 0: # If the region contains a point
                 
-
                 if region.points[0].x == point.x and region.points[0].y == point.y: # If the coordinates match
                     return True   
             
@@ -153,25 +154,30 @@ class QuadTree(object):
         pathway = ""
 
         # First lets check if point exists before we find the pathway
-        if self.contains(point) is False:
-            return "No pathway available"
+        if self.contains(point) is False: # We are not getting this so we know after we insert it in the new region and reset the points it not breaking
+            return "No pathway available for points Point(%s, %s)", point.x, point.y
 
         while region is not None: # If the region exists
 
-            if point.x == region.points[0].x and point.y == region.points[0].y:
-                # If we found the pathway but remains in the root region ... no concatenation to pathway
-                
-                return "Point lies in root region" if pathway == "" else pathway
+            if len(region.points) > 0: # Root region no longer contains points but still has capacity which is good
+
+                    if point.x == region.points[0].x and point.y == region.points[0].y:
+                        # If we found the pathway but remains in the root region ... no concatenation to pathway
+                        
+                        return "Point lies in root region" if pathway == "" else pathway, region.depth, region.points[0].x
+
+            # elif region.capacity > 0:  # Meaning no point but the capacity is greater than 1 showing there is a path
 
             quadrant = region.region_index(point)
             pathway += str("Quadrant -> {} ".format(quadrant)) # Only add pathway if index of quadrant exists
 
             region = region.children[quadrant] # Keep going until you find specific quadrant that contains point
             
-        return pathway
+        return pathway, region.depth
 
 # Second element not working as a result of the subdivide
-quad_tree = QuadTree(100, 100, [Point(150, 150),Point(60, 120), Point(120, 140)])
+# quad_tree = QuadTree(100, 100, [Point(150, 150),Point(120, 140), Point(60, 120),])
+quad_tree = QuadTree(100, 100, [Point(50, 50), Point(150, 150),Point(160, 160), Point(155, 155)])
 points_array = []
 
 # for i in range(20):
@@ -185,17 +191,17 @@ points_array = []
 #     print(quad_tree.pathway(point))
 #     print("")
 
+print(quad_tree.pathway(Point(50, 50)))
+print("")
+
 print(quad_tree.pathway(Point(150, 150)))
 print("")
 
-print(quad_tree.pathway(Point(60, 120)))
+print(quad_tree.pathway(Point(160, 160)))
 print("")
 
-print(quad_tree.pathway(Point(120, 140)))
+print(quad_tree.pathway(Point(155, 155)))
 print("")
 
-# print(quad_tree.pathway(Point(40, 40)))
-# print("")
-
-# print(quad_tree.pathway(Point(95, 120)))
-# print("")
+# # print(quad_tree.pathway(Point(95, 120)))
+# # print("")
