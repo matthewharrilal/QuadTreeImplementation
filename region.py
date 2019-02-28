@@ -17,39 +17,40 @@ class RegionNode(object):
 
         self.depth = 0
 
-    def insert(self, point, existing_point=None,super_region=None):
+    def insert(self, point):
         '''Inserts point inside region that contains that coordinate space'''
-       
-        if existing_point is None and super_region is None:
-            existing_point = self.points[0]
-            super_region = self
       
         if self.capacity == 0:  
             self.points.append(point) 
             self.capacity += 1
-
-            existing_quadrant = self.region_index(existing_point)
-            super_region.children[existing_quadrant].points.append(existing_point)
-
             return 
 
 
-        if self.capacity > 0 : # Meaning that there is already a point in the region
+        if self.capacity > 0: # Meaning that there is already a point in the region
             if self.isDivided == False:  # Meaning that we haven't subdivided the region
                 
                 # You know when you subdivide there is an existing point becuase the capacity is 1 and it hasnt been divided yet therefore 
                 self.subdivide()
-                self.isDivided = True   
+                self.isDivided = True  
+
+ 
 
                 # We can take that existing point
+                existing_point = self.points[0]
+                existing_quadrant = self.region_index(existing_point)
+
+                self.children[existing_quadrant].points.append(existing_point)
+                # print("New existing quadrant %s", existing_quadrant, existing_point.x)
+                # self.children[existing_quadrant].capacity  += 1
+                self.points = []
+
 
             # Find where new point should be inserted
             quadrant = self.region_index(point)
-
             subregion = self.children[quadrant]  
             subregion.depth = self.depth + 1
 
-            subregion.insert(point, self.points[0], self)  # Insert the point into the proper subregion
+            subregion.insert(point)  # Insert the point into the proper subregion
             
             
 
@@ -103,7 +104,6 @@ class QuadTree(object):
     # SOMETHING WRONG WITH THE ACT OF REASSIGNING POINTS
     def insert(self, point, region=None):
         '''Inserts point inside region that contains that coordinate space'''
-        exists = []
 
         # Meaning that the point can lie in the root region
         if self.root_region.capacity == 0: 
@@ -117,7 +117,7 @@ class QuadTree(object):
                 existing_point = self.root_region.points[0]
                 self.root_region.insert(existing_point)  # Rebalance existing point then clear the regions existing point
                 self.root_region.insert(point)
-                self.root_region.points = []
+                # self.root_region.points = []
                 return
 
             else:  # Meaning that the region had a capacity of 1 but there was no existing point then lets just find a region for the new point
@@ -164,7 +164,7 @@ class QuadTree(object):
                     if point.x == region.points[0].x and point.y == region.points[0].y:
                         # If we found the pathway but remains in the root region ... no concatenation to pathway
                         
-                        return "Point lies in root region" if pathway == "" else pathway, region.depth, region.points[0].x
+                        return "Point lies in root region" if pathway == "" else pathway
 
             # elif region.capacity > 0:  # Meaning no point but the capacity is greater than 1 showing there is a path
 
@@ -177,7 +177,7 @@ class QuadTree(object):
 
 # Second element not working as a result of the subdivide
 # quad_tree = QuadTree(100, 100, [Point(150, 150),Point(120, 140), Point(60, 120),])
-quad_tree = QuadTree(100, 100, [Point(50, 50), Point(150, 150),Point(160, 160), Point(155, 155)])
+quad_tree = QuadTree(100, 100, [Point(50, 50), Point(150, 150),Point(160, 160)])
 points_array = []
 
 # for i in range(20):
@@ -200,8 +200,8 @@ print("")
 print(quad_tree.pathway(Point(160, 160)))
 print("")
 
-print(quad_tree.pathway(Point(155, 155)))
-print("")
+# print(quad_tree.pathway(Point(155, 155)))
+# print("")
 
 # # print(quad_tree.pathway(Point(95, 120)))
 # # print("")
