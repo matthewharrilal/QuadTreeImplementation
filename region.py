@@ -34,14 +34,15 @@ class RegionNode(object):
                 self.isDivided = True  
 
  
-
                 # We can take that existing point
                 existing_point = self.points[0]
                 existing_quadrant = self.region_index(existing_point)
+                print(existing_point.x, point.x ,existing_quadrant,self.region_index(point))
 
+                # Rebalance existing point by placing it in the new quadrant
                 self.children[existing_quadrant].points.append(existing_point)
-                # print("New existing quadrant %s", existing_quadrant, existing_point.x)
-                # self.children[existing_quadrant].capacity  += 1
+
+                self.children[existing_quadrant].capacity  += 1
                 self.points = []
 
 
@@ -113,16 +114,7 @@ class QuadTree(object):
 
         else:  # Meaning that there is a point that already exists within the region
             
-            if len(self.root_region.points) > 0:  # Meaning we know the capacity is 1 and there is an existing point inside the region
-                existing_point = self.root_region.points[0]
-                self.root_region.insert(existing_point)  # Rebalance existing point then clear the regions existing point
-                self.root_region.insert(point)
-                # self.root_region.points = []
-                return
-
-            else:  # Meaning that the region had a capacity of 1 but there was no existing point then lets just find a region for the new point
-                self.root_region.insert(point)
-                return
+            self.root_region.insert(point)
 
             
                 
@@ -163,7 +155,6 @@ class QuadTree(object):
 
                     if point.x == region.points[0].x and point.y == region.points[0].y:
                         # If we found the pathway but remains in the root region ... no concatenation to pathway
-                        
                         return "Point lies in root region" if pathway == "" else pathway
 
             # elif region.capacity > 0:  # Meaning no point but the capacity is greater than 1 showing there is a path
@@ -173,35 +164,35 @@ class QuadTree(object):
 
             region = region.children[quadrant] # Keep going until you find specific quadrant that contains point
             
-        return pathway, region.depth
+        return pathway
 
 # Second element not working as a result of the subdivide
 # quad_tree = QuadTree(100, 100, [Point(150, 150),Point(120, 140), Point(60, 120),])
 quad_tree = QuadTree(100, 100, [Point(50, 50), Point(150, 150),Point(160, 160)])
 points_array = []
 
-# for i in range(20):
-#     random_x = random.randint(0,1000)
-#     random_y = random.randint(0,1000)
-#     points_array.append(Point(random_x, random_y))
-#     quad_tree.insert(Point(random_x, random_y))
+for i in range(20):
+    random_x = random.randint(0,1000)
+    random_y = random.randint(0,1000)
+    points_array.append(Point(random_x, random_y))
+    quad_tree.insert(Point(random_x, random_y))
 
 
-# for point in points_array:
-#     print(quad_tree.pathway(point))
-#     print("")
+for point in points_array:
+    print(quad_tree.pathway(point))
+    print("")
 
-print(quad_tree.pathway(Point(50, 50)))
-print("")
-
-print(quad_tree.pathway(Point(150, 150)))
-print("")
-
-print(quad_tree.pathway(Point(160, 160)))
-print("")
-
-# print(quad_tree.pathway(Point(155, 155)))
+# print(quad_tree.pathway(Point(50, 50)))
 # print("")
 
-# # print(quad_tree.pathway(Point(95, 120)))
+# print(quad_tree.pathway(Point(150, 150)))
+# print("")
+
+# print(quad_tree.pathway(Point(160, 160)))
+# print("")
+
+# # print(quad_tree.pathway(Point(155, 155)))
 # # print("")
+
+# # # print(quad_tree.pathway(Point(95, 120)))
+# # # print("")
